@@ -1,0 +1,111 @@
+### Configuración del escenario RYSCA/simple_con_router
+
+#Router:
+
+configure terminal
+interface eth0.2
+shutdown
+exit
+interface eth0.3
+shutdown
+exit
+interface eth0.4
+shutdown
+exit
+interface wlan0
+shutdown
+exit
+interface eth0.0
+ip addr 10.0.1.1/24
+no ip addr 192.168.0.1/24
+exit
+interface eth0.1
+ip addr 10.0.2.1/24
+no ip addr 192.168.1.1/24
+exit
+ip route 10.0.1.0/24 10.0.1.1              
+ip route 10.0.2.0/24 10.0.2.1
+exit
+
+#Host X:
+
+sudo ip addr add 10.0.1.2/24 dev eth1
+sudo ip addr del 192.100.100.101/24 dev eth1
+sudo ip route add 10.0.2.0/24 via 10.0.1.1 dev eth1
+
+#Host Y:
+
+sudo ip addr add 10.0.2.2/24 dev eth1
+sudo ip addr del 192.100.100.102/24 dev eth1
+sudo ip route add 10.0.1.0/24 via 10.0.2.1 dev eth1
+
+
+### Compilar y correr-------------IPV4-------------------------------------------
+
+#Cliente ipv4:
+
+rawnetcc /tmp/ipv4_client ipv4_client.c eth.c arp.c ipv4.c ipv4_config.c ipv4_route_table.c
+/tmp/ipv4_client 10.0.2.2 100 ipv4_config_client_wrouter.txt ipv4_route_table_client.txt
+
+#Servidor ipv4:
+
+rawnetcc /tmp/ipv4_server ipv4_server.c eth.c arp.c ipv4.c ipv4_config.c ipv4_route_table.c
+/tmp/ipv4_server ipv4_config_server_wrouter.txt ipv4_route_table_server.txt
+
+
+### Compilar y correr--------------UDP-------------------------------------------
+
+
+#Servidor UDP
+rawnetcc /tmp/udp_server udp_server.c eth.c arp.c ipv4.c ipv4_config.c ipv4_route_table.c udp.c
+/tmp/udp_server ipv4_config_server_wrouter.txt ipv4_route_table_server.txt 37
+
+#Cliente UDP
+rawnetcc /tmp/udp_client udp_client.c eth.c arp.c ipv4.c ipv4_config.c ipv4_route_table.c udp.c
+/tmp/udp_client 10.0.1.2 100 ipv4_config_client_wrouter.txt ipv4_route_table_client.txt 37
+
+
+****************************************************************************************************
+
+### Configuración del escenario RYSCA/simple
+
+### Compilar y correr-------------IPV4-------------------------------------------
+
+#Cliente ipv4:
+
+(Host Y 192.100.100.102)
+
+rawnetcc /tmp/ipv4_client ipv4_client.c eth.c arp.c ipv4.c ipv4_config.c ipv4_route_table.c
+/tmp/ipv4_client 192.100.100.101 1400 ipv4_config_client.txt ipv4_route_table_client.txt
+
+#Servidor ipv4:
+
+(Host X 192.100.100.101)
+
+rawnetcc /tmp/ipv4_server ipv4_server.c eth.c arp.c ipv4.c ipv4_config.c ipv4_route_table.c
+/tmp/ipv4_server ipv4_config_server.txt ipv4_route_table_server.txt
+
+
+### Compilar y correr--------------UDP-------------------------------------------
+
+#Cliente UDP:  
+
+(Host Y 192.100.100.102)
+
+rawnetcc /tmp/udp_client udp_client.c eth.c arp.c ipv4.c ipv4_config.c ipv4_route_table.c udp.c
+/tmp/udp_client 192.100.100.101 100 ipv4_config_client.txt ipv4_route_table_client.txt 37
+
+#Server UDP:     
+
+(Host X 192.100.100.101)
+       
+rawnetcc /tmp/udp_server udp_server.c eth.c arp.c ipv4.c ipv4_config.c ipv4_route_table.c udp.c
+/tmp/udp_server ipv4_config_server.txt ipv4_route_table_server.txt 37
+
+
+
+
+
+
+
+
